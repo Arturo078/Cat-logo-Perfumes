@@ -458,3 +458,99 @@
             grid.innerHTML = '';
 
             perfumesAM</antArtifact>
+                    // Función para mostrar perfumes
+        function mostrarPerfumes(perfumesAMostrar) {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+
+            perfumesAMostrar.forEach(perfume => {
+                const perfumeHTML = `
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img src="${perfume.imagen}" alt="${perfume.nombre}">
+                            <div class="product-badges">
+                                ${perfume.nuevo ? '<span class="badge new">Nuevo</span>' : ''}
+                                <span class="badge gender">${perfume.genero === 'dama' ? 'Dama' : 'Caballero'}</span>
+                            </div>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-brand">${perfume.marca}</div>
+                            <div class="product-title">${perfume.nombre}</div>
+                            <p>${perfume.descripcion}</p>
+                            <div class="product-details">
+                                <span class="product-detail"><strong>Notas:</strong> ${perfume.notas}</span>
+                                <span class="product-detail"><strong>Tamaños:</strong> ${perfume.tamanos.join(', ')}</span>
+                            </div>
+                            <div class="product-price">$${perfume.precio.toFixed(2)} USD</div>
+                            <div class="product-actions">
+                                <a href="https://wa.me/TUNUMERODEWHATSAPP?text=Hola,%20me%20interesa%20el%20perfume%20${encodeURIComponent(perfume.nombre)}" 
+                                   class="action-btn whatsapp-btn" target="_blank">
+                                    <i class="fab fa-whatsapp"></i> Comprar
+                                </a>
+                                <button class="action-btn info-btn">Detalles</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += perfumeHTML;
+            });
+        }
+
+        // Mostrar perfumes al cargar la página
+        mostrarPerfumes(perfumes);
+
+        // Filtrado de perfumes
+        const filtros = {
+            gender: "todos",
+            brand: null,
+            family: null
+        };
+
+        document.querySelectorAll(".filter-btn").forEach(button => {
+            button.addEventListener("click", function() {
+                const filterType = this.getAttribute("data-filter");
+                const filterValue = this.getAttribute("data-value");
+
+                // Desactivar todos los botones del mismo filtro
+                document.querySelectorAll(`.filter-btn[data-filter="${filterType}"]`).forEach(btn => {
+                    btn.classList.remove("active");
+                });
+
+                // Activar el botón seleccionado
+                this.classList.add("active");
+
+                // Guardar el filtro en el objeto
+                filtros[filterType] = filterValue === "todos" ? null : filterValue;
+
+                // Aplicar los filtros
+                aplicarFiltros();
+            });
+        });
+
+        function aplicarFiltros() {
+            let perfumesFiltrados = perfumes.filter(perfume => {
+                return (
+                    (!filtros.gender || perfume.genero === filtros.gender) &&
+                    (!filtros.brand || perfume.marca.toLowerCase().replace(/\s/g, "-") === filtros.brand) &&
+                    (!filtros.family || perfume.familia === filtros.family)
+                );
+            });
+
+            mostrarPerfumes(perfumesFiltrados);
+        }
+
+        // Búsqueda en tiempo real
+        document.getElementById("searchInput").addEventListener("input", function() {
+            const searchText = this.value.toLowerCase();
+            const perfumesFiltrados = perfumes.filter(perfume =>
+                perfume.nombre.toLowerCase().includes(searchText) ||
+                perfume.marca.toLowerCase().includes(searchText) ||
+                perfume.familia.toLowerCase().includes(searchText) ||
+                perfume.notas.toLowerCase().includes(searchText)
+            );
+
+            mostrarPerfumes(perfumesFiltrados);
+        });
+    </script>
+</body>
+</html>
